@@ -8,7 +8,8 @@ export default class RandomPlanet extends Component {
 
 	state={
 		planet: {},
-		loading:true
+		loading:true,
+		error: false
 	}
 
 	constructor(){		
@@ -19,30 +20,40 @@ export default class RandomPlanet extends Component {
 	swapiService = new SwapiService();	
 
 	updatePlanet(){
-		const id = 11 ;
+		const id = 10 ;
 		this.swapiService
 			.getPlanet(id)
 			.then(this.onPlanetLoaded)
+			.catch(this.onError)
 	}	
+	onError = (err) => {
+		this.setState({
+			error:true,
+			loading:false
+		})
+	}
 
 	onPlanetLoaded = (planet) =>{
 		this.setState({
 			planet,
-			loading:false
+			loading:false,
+			error:false
 		});		
 	}
 	
 
 	render() {
 	
-		const { planet, loading } = this.state;
+		const { planet, loading, error} = this.state;
 
+		const hasData = !(loading || error)
+		const errorMessage = error ? "ERROR" : null;
 		const spinner = loading ? <Spinner/> : null;
-		const content = !loading ? <PlanetView planet={planet} /> : null;
-
+		const content = hasData ? <PlanetView planet={planet} /> : null;
 
 		return (
 			<div className="random-planet jumbotron rounded">
+				{errorMessage}
 				{spinner}
 				{content}
 			</div>
